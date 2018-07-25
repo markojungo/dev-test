@@ -80,6 +80,10 @@
   <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/BIO/breast_implant_shell"/>
 </owl:Class>
 
+<owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/BIO/versionModelNumber"/>
+
+<owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/BIO/devicePublishDate"/>
+
 <owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/BIO/deviceDescription"/>
 
 <owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/BIO/gudidLink"/>
@@ -206,6 +210,17 @@
   <owl:inverseOf rdf:resource="http://purl.obolibrary.org/BIO/has_subject_device"/>
 </owl:ObjectProperty>
 
+<owl:ObjectProperty rdf:about="http://purl.obolibrary.org/BIO/has_pma_supplement">
+  <rdfs:domain rdf:resource="http://purl.obolibrary.org/BIO/breast_implant_device"/>
+  <rdfs:range rdf:resource="http://purl.obolibrary.org/BIO/fda_pma_submission_supplement"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="http://purl.obolibrary.org/BIO/is_pma_supplement_of">
+  <rdfs:domain rdf:resource="http://purl.obolibrary.org/BIO/fda_pma_submission_supplement"/>
+  <rdfs:range rdf:resource="http://purl.obolibrary.org/BIO/breast_implant_device"/>
+  <owl:inverseOf rdf:resource="http://purl.obolibrary.org/BIO/has_pma_supplement"/>
+</owl:ObjectProperty>
+
 <owl:DatatypeProperty rdf:about="http://purl.obolibrary.org/BIO/has_diameter">
   <rdfs:range>
     <rdfs:Datatype>
@@ -259,10 +274,6 @@
 <owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/BIO/catalogNumber"/>
 
 <owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/BIO/deviceID"/>
-
-<owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/BIO/versionModelNumber"/>
-
-<owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/BIO/devicePublishDate"/>
 
 
 </rdf:RDF>

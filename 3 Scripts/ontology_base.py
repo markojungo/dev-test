@@ -23,7 +23,7 @@ set_render_func(render_using_label)
 with onto:
     # ------- CLASSES ---------
     class breast_implant_device(Thing): pass
-    class breast_implant_brand(Thing): pass
+    # class breast_implant_brand(Thing): pass
     class breast_implant_filling(Thing): pass
     class breast_implant_manufacturer(Thing): pass
     class breast_implant_product_code(Thing): pass
@@ -78,7 +78,13 @@ with onto:
         domain = [breast_implant_device]
         range = [fda_pma_submission]
         inverse_property = has_subject_device
-    
+    class has_pma_supplement(ObjectProperty):
+        domain = [breast_implant_device]
+        range = [fda_pma_submission_supplement]
+    class is_pma_supplement_of(ObjectProperty):
+        domain = [fda_pma_submission_supplement]
+        range = [breast_implant_device]
+        inverse_property = has_pma_supplement
 
     # ------- DATA PROPERTIES ---------
     positiveInteger = ConstrainedDatatype(int, min_exclusive=0)

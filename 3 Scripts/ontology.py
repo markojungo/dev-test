@@ -59,6 +59,7 @@ for key, _value in statement_funcs.items():
 for s in strs:
     exec(s)
 
+# manually add pma numbers 
 bio.Ideal_Implant_Structured_Breast_Implant.is_subject_device_of = [bio.P120011]
 bio.Mentor_MemoryGel_Silicone_Gel_Filled_Breast_Implant.is_subject_device_of = [bio.P030053]
 bio.Mentor_MemoryShape_Breast_Implant.is_subject_device_of = [bio.P060028]
@@ -67,6 +68,8 @@ bio.Natrelle_410_Highly_Cohesive_Anatomically_Shaped_Silicone_Filled_Breast_Impl
 bio.Natrelle_Saline_Filled_Breast_Implant.is_subject_device_of = [bio.P990074]
 bio.Natrelle_Silicone_Filled_Breast_Implant.is_subject_device_of = [bio.P020056]
 bio.Sientra_OPUS_Silicone_Gel_Breast_Implant.is_subject_device_of = [bio.P070004]
+
+
 
 # assign individual devices
 # STRUCTURE
@@ -96,7 +99,6 @@ for idx, row in all_sheet.iterrows():
             namespace = bio
 
         {row['company brand name']}.has_manufacturer.append(bio.{row['manufacturer']})
-        {row['company brand name']}.has_filling.append(bio.{row['filling']})
         {row['company brand name']}.has_shell.append(bio.{row['shell']})
 
         if "{row['company brand name lower']}" != "nan":
@@ -111,10 +113,12 @@ for idx, row in all_sheet.iterrows():
             class {row['device specific name']}(bio.{row['company brand name']}):
                 namespace = bio
 
+        {row['device specific name']}.has_filling.append(bio.{row['filling']})
         {row['device specific name']}.has_shell_surface.append(bio.{row['shell surface']})
         {row['device specific name']}.has_shape.append(bio.{row['shape']})
-        {row['device specific name']}.has_product_code = [bio.{row['productCode']}]
-        {row['device specific name']}.is_subject_device_of.append(bio.{row['fda pma number']})
+
+        # {row['device specific name']}.is_subject_device_of.append(bio.{row['fda pma number']})
+        {row['device specific name']}.has_pma_supplement.append(bio.{row['fda pma number with supplement']})
 
         {row['device specific name']}.catalogNumber = "{row['catalogNumber']}"
         {row['device specific name']}.versionModelNumber = "{row['versionModelNumber']}"
@@ -129,5 +133,52 @@ for idx, row in all_sheet.iterrows():
         exec(exec_str)
     except TypeError as e:
         raise TypeError(f"{exec_str}", e)
+
+# recreate fda pma links for outer class
+# recreate fda pma subject devices
+for pma in onto.search(is_a=onto.fda_pma_submission):
+    pma.pmaLink = f"https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id={pma.name}"
+
+# GLOBAL COUNTER
+ctr = 0
+
+# replace various inconsistencies
+def repl_stuff(s):
+    repl_dict = {
+        "Gel Filled"     : "Gel-Filled",
+        "gel filled"     : "gel-filled",
+        "Saline Filled"  : "Saline-Filled",
+        "saline filled"  : "saline-filled",
+        "Height "        : "Height/",
+        "Moderate plus"  : "Moderate-plus",
+        "moderate plus"  : "moderate-plus",
+        "HSC plus"       : "HSC-plus",
+        "Extra full"     : "Extra-full",
+        "extra full"     : "extra full",
+        "Ultra high"     : "Ultra-high",
+        "ultra high"     : "ultra-high",
+        "__"             : "_"          # fix this in process_data
+    }
+    for key, value in repl_dict.items():
+        if key in s:
+            s = s.replace(key, value)
+    return s
+
+# refactor classes
+for c in onto.classes():
+    c.label = repl_stuff(c.name.replace('_',' '))
+    c.iri = re.sub(r'BIO/.*$', f"BIO/BIO_{str(ctr).zfill(7)}", c.iri)
+    ctr += 1
+
+# refactor properties
+for p in onto.properties():
+    p.label = p.name.replace('_',' ')
+    p.iri = re.sub(r'BIO/.*$', f"BIO/BIO_{str(ctr).zfill(7)}", p.iri)
+    ctr += 1
+
+for i in onto.individuals():
+    i.label = i.name.replace('_',' ')
+    i.iri = re.sub(r'BIO/.*$', f"BIO/BIO_{str(ctr).zfill(7)}", i.iri)
+    ctr += 1
 
 onto.save("1 Ontology/test1.owl")
